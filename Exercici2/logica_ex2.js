@@ -73,5 +73,3 @@ function init() {
 
     actualitzarEstatVisual();
 }
-
-document.addEventListener("DOMContentLoaded", init);
