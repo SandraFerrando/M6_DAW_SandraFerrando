@@ -1,37 +1,31 @@
-<html></html>
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <title>Practica 1</title>
     <style>
-        .error { 
-            color: red; 
-            display: none; 
-        }
-        .input-error {
-            border-color: red;
-        }
+        .error { color: red; display: none; }
+        .input-error { border: 2px solid red; }
+        #estat-actual { margin-top: 20px; padding: 10px; background-color: #f0f0f0; }
     </style>
-
-<script src="logica_ex2.js">
-</script>
-
-<h1>Practica 1</h1>
-<form onsubmit="return false;">
-    <br/>
-    <label id="namelabel" for="name">Nom:</label>
-    <br/>
-    <input id="name" type="text">
-
-    <span id="count">0</span>
-    <br/>
-
-    <label id="lastname" for="lastname">Cognom:</label>
-    <br/>
-    <input id="lastname" type="text">
-    <button onclick="afetgir();">ADD</button>
+</head>
+<body>
+    <h1>Practica 1</h1>
     
-</form>
-<span id="error-message" class="error"></span>
-<br/><hr/>
+    <label for="name">Nom:</label>
+    <input type="text" id="name" name="name">
+    
+    <label for="surname">Cognom:</label>
+    <input type="text" id="surname" name="surname">
+    
+    <button onclick="afegirItem()">ADD</button>
+    
+    <span id="error-message" class="error"></span>
+    
+    <p>Nombre d'elements: <span id="count">0</span></p>
+    
 
 
-<div id="items"> </div>
-
+    <script src="logica_ex2.js"></script>
+</body>
 </html>

@@ -1,31 +1,45 @@
 let items = [];
 
-// Funció per validar el valor de l'input
-function validaInput(inputValue) {
+function validaInput(inputValue, inputId) {
     let forbidden = /[<>]/;
     let errorMessage = document.getElementById("error-message");
-    let inputField = document.getElementById("name");
+    let inputField = document.getElementById(inputId);
 
     if (inputValue.trim() === "") {
-        // Si l'input està buit, mostra un missatge d'error
         errorMessage.innerHTML = "L'entrada no pot estar buida.";
-        errorMessage.style.display = "inline";  // Mostra el missatge d'error
-        inputField.classList.add("input-error");  // Afegeix el contorn vermell
+        errorMessage.style.display = "inline";
+        inputField.classList.add("input-error");
         return false;
     } else if (forbidden.test(inputValue)) {
-        // Si l'input conté símbols prohibits, mostra l'error i canvia el color
         errorMessage.innerHTML = "Els símbols '<' i '>' no estan permesos.";
-        errorMessage.style.display = "inline";  // Mostra el missatge d'error
-        inputField.classList.add("input-error");  // Afegeix el contorn vermell
+        errorMessage.style.display = "inline";
+        inputField.classList.add("input-error");
         return false;
     } else {
-        // Si és vàlid, amaga l'error i restableix el color
-        errorMessage.style.display = "none";  // Amaga el missatge d'error
-        inputField.classList.remove("input-error");  // Elimina el contorn vermell
+        errorMessage.style.display = "none";
+        inputField.classList.remove("input-error");
         return true;
     }
 }
 
+function afegirItem() {
+    let nom = document.getElementById("name").value;
+    let cognom = document.getElementById("surname").value;
+
+    if (validaInput(nom, "name") && validaInput(cognom, "surname")) {
+        let item = nom + " " + cognom;
+        items.push(item);
+        document.getElementById("count").innerHTML = items.length;
+        document.getElementById("name").value = "";
+        document.getElementById("surname").value = "";
+        mostra();
+        
+        console.log("Afegit nou item:", item);
+        console.log("Estat actual de l'array items:", items);
+        
+        actualitzarEstatVisual();
+    }
+}
 
 function mostra() {
     var html = "<ul>";
@@ -37,7 +51,27 @@ function mostra() {
 }
 
 function deleteItems(index) {
+    let itemEliminat = items[index];
     items.splice(index, 1);
     document.getElementById("count").innerHTML = items.length;
     mostra();
+    
+    console.log("Eliminat item:", itemEliminat);
+    console.log("Estat actual de l'array items:", items);
+    
 }
+
+
+function init() {
+    document.getElementById("name").addEventListener("input", function() {
+        validaInput(this.value, "name");
+    });
+
+    document.getElementById("surname").addEventListener("input", function() {
+        validaInput(this.value, "surname");
+    });
+
+    actualitzarEstatVisual();
+}
+
+document.addEventListener("DOMContentLoaded", init);

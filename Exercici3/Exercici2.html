@@ -1,0 +1,37 @@
+<html></html>
+    <style>
+        .error { 
+            color: red; 
+            display: none; 
+        }
+        .input-error {
+            border-color: red;
+        }
+    </style>
+
+<script src="logica_ex2.js">
+</script>
+
+<h1>Practica 1</h1>
+<form onsubmit="return false;">
+    <br/>
+    <label id="namelabel" for="name">Nom:</label>
+    <br/>
+    <input id="name" type="text">
+
+    <span id="count">0</span>
+    <br/>
+
+    <label id="lastname" for="lastname">Cognom:</label>
+    <br/>
+    <input id="lastname" type="text">
+    <button onclick="afetgir();">ADD</button>
+    
+</form>
+<span id="error-message" class="error"></span>
+<br/><hr/>
+
+
+<div id="items"> </div>
+
+</html>
