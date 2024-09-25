@@ -6,10 +6,16 @@ function validaInput(inputValue) {
     let errorMessage = document.getElementById("error-message");
     let inputField = document.getElementById("name");
 
-    if (forbidden.test(inputValue)) {
+    if (inputValue.trim() === "") {
+        // Si l'input està buit, mostra un missatge d'error
+        errorMessage.innerHTML = "L'entrada no pot estar buida.";
+        errorMessage.style.display = "inline";  // Mostra el missatge d'error
+        inputField.classList.add("input-error");  // Afegeix el contorn vermell
+        return false;
+    } else if (forbidden.test(inputValue)) {
         // Si l'input conté símbols prohibits, mostra l'error i canvia el color
         errorMessage.innerHTML = "Els símbols '<' i '>' no estan permesos.";
-        errorMessage.style.display = "inline"; // Mostra el missatge d'error
+        errorMessage.style.display = "inline";  // Mostra el missatge d'error
         inputField.classList.add("input-error");  // Afegeix el contorn vermell
         return false;
     } else {
@@ -20,15 +26,6 @@ function validaInput(inputValue) {
     }
 }
 
-function afetgir() {
-    let inputValue = document.getElementById("name").value;
-
-    // Utilitzem la nova funció de validació
-    if (validaInput(inputValue)) {
-        items.push(inputValue);
-        document.getElementById("count").innerHTML = items.length;
-    }
-}
 
 function mostra() {
     var html = "<ul>";
