@@ -4,52 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestor de Factures</title>
-<!-- Modal -->
-<div id="invoiceModal" class="modal">
-    <div class="modal-content">
-        <span class="close" onclick="closeModal()">&times;</span>
-        <h2>Detalls de la Factura</h2>
-        <div id="invoiceDetails"></div>
+    <!-- Modal -->
+    <div id="invoiceModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Detalls de la Factura</h2>
+            <div id="invoiceDetails"></div>
+        </div>
     </div>
-</div>
-
-<style>
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgb(0,0,0);
-        background-color: rgba(0,0,0,0.4);
-        padding-top: 60px;
-    }
-
-    .modal-content {
-        background-color: #fefefe;
-        margin: 5% auto;
-        padding: 20px;
-        border: 1px solid #888;
-        width: 80%;
-    }
-
-    .close {
-        color: #aaa;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
-
-    .close:hover,
-    .close:focus {
-        color: black;
-        text-decoration: none;
-        cursor: pointer;
-    }
-</style>
+    <link rel="stylesheet" href="styles.css">
 
 </head>
 <body>
@@ -62,13 +25,19 @@
         
         <h3>Línies de Factura</h3>
         <table id="invoice-lines">
-            <tr>
-                <th>Descripció</th>
-                <th>Quantitat</th>
-                <th>Preu</th>
-                <th>Accions</th>
-            </tr>
-
+            <thead>
+                <tr>
+                    <th>Descripció</th>
+                    <th>Quantitat</th>
+                    <th>Preu</th>
+                    <th>Total Línia</th>
+                    <th>Accions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Les files de la factura s'afegiran aquí dinàmicament -->
+            </tbody>
+        </table>
         </table>
         <button type="button" onclick="addLine()">Afegir Línia</button>
         

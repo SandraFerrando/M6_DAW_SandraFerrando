@@ -10,17 +10,49 @@ function addLine() {
         <td><input type="text" class="description" required></td>
         <td><input type="number" class="quantity" required></td>
         <td><input type="number" class="price" required></td>
+        <td class="line-total">0.00</td>
         <td><button type="button" onclick="removeLine(this)">Eliminar</button></td>
     `;
+
+    setupLineListeners(newRow);
 
     // Obtenir els inputs de la nova fila
     const quantityInput = newRow.querySelector('.quantity');
     const priceInput = newRow.querySelector('.price');
 
     // Afegir l'event listener per a la quantitat
-    quantityInput.addEventListener('input', calculateTotal);
+    quantityInput.addEventListener('input', function() {
+        calculateLineTotal(this.parentElement.parentElement);
+        calculateTotal();
+    });
     // Afegir l'event listener per al preu
-    priceInput.addEventListener('input', calculateTotal);
+    priceInput.addEventListener('input', function() {
+        calculateLineTotal(this.parentElement.parentElement);
+        calculateTotal();
+    });
+}
+
+function setupLineListeners(row) {
+    const quantityInput = row.querySelector('.quantity');
+    const priceInput = row.querySelector('.price');
+
+    quantityInput.addEventListener('input', function() {
+        calculateLineTotal(row);
+        calculateTotal();
+    });
+
+    priceInput.addEventListener('input', function() {
+        calculateLineTotal(row);
+        calculateTotal();
+    });
+}
+
+
+function calculateLineTotal(row) {
+    const quantity = parseFloat(row.querySelector('.quantity').value) || 0;
+    const price = parseFloat(row.querySelector('.price').value) || 0;
+    const lineTotal = quantity * price;
+    row.querySelector('.line-total').textContent = lineTotal.toFixed(2);
 }
 
 // Funció per eliminar una línia
@@ -35,20 +67,25 @@ function initializeDiscountListener() {
     discountInput.addEventListener('input', calculateTotal);
 }
 
+document.addEventListener('DOMContentLoaded', (event) => {
+    initializeDiscountListener(); // Afegir listener al descompte
+});
+
 
 // Funció per calcular el total
 function calculateTotal() {
     let total = 0;
-    const lines = document.querySelectorAll('#invoice-lines tr:not(:first-child)'); // Seleccionar totes les línies de factura
+    const lines = document.querySelectorAll('#invoice-lines tbody tr');
     lines.forEach(line => {
-        const quantity = parseFloat(line.querySelector('.quantity').value) || 0; // Obtenir la quantitat
-        const price = parseFloat(line.querySelector('.price').value) || 0; // Obtenir el preu
-        total += quantity * price; // Afegeix al total
+        const lineTotal = parseFloat(line.querySelector('.line-total').textContent) || 0;
+        total += lineTotal;
     });
-    const discount = parseFloat(document.getElementById('discount').value) || 0; // Obtenir descompte
-    total -= total * (discount / 100); // Aplicar descompte
-    document.getElementById('total').innerText = total.toFixed(2); // Actualitzar el total a l'HTML
+    const discount = parseFloat(document.getElementById('discount').value) || 0;
+    total -= total * (discount / 100);
+    document.getElementById('total').innerText = total.toFixed(2);
 }
+
+
 
 // Gestor d'esdeveniments per enviar el formulari
 document.getElementById('invoice-form').addEventListener('submit', function(event) {
@@ -56,28 +93,31 @@ document.getElementById('invoice-form').addEventListener('submit', function(even
     
     const client = document.getElementById('client').value;
     const total = document.getElementById('total').innerText;
+    const discount = document.getElementById('discount').value;
     const lines = [];
 
-    const invoiceLines = document.querySelectorAll('#invoice-lines tr:not(:first-child)');
+    const invoiceLines = document.querySelectorAll('#invoice-lines tbody tr');
     invoiceLines.forEach(line => {
         const description = line.querySelector('.description').value;
-        const quantity = parseFloat(line.querySelector('.quantity').value) || -1;
-        const price = parseFloat(line.querySelector('.price').value) || -1;
-        lines.push({ description, quantity, price });
+        const quantity = parseFloat(line.querySelector('.quantity').value) || 0;
+        const price = parseFloat(line.querySelector('.price').value) || 0;
+        const lineTotal = parseFloat(line.querySelector('.line-total').textContent) || 0;
+        lines.push({ description, quantity, price, lineTotal });
     });
 
     if (currentEditingIndex >= 0) {
         // Actualitzar la factura existent
-        invoices[currentEditingIndex] = { client, total, lines };
+        invoices[currentEditingIndex] = { client, total, discount, lines };
         currentEditingIndex = -1; // Resetem l'índex d'edició
     } else {
         // Crear una nova factura
-        invoices.push({ client, total, lines });
+        invoices.push({ client, total, discount, lines });
     }
 
     renderInvoices();
     this.reset(); // Reiniciar el formulari
     clearInvoiceInputFields(); // Netejar els inputs de les línies de factura
+    addLine(); // Afegir una nova línia en blanc
     calculateTotal(); // Recalcular el total després de guardar la factura
 });
 
@@ -145,29 +185,38 @@ function editInvoice(index) {
 
     // Afegir les línies de la factura
     invoice.lines.forEach(line => {
-        const table = document.getElementById('invoice-lines');
+        const table = document.getElementById('invoice-lines').getElementsByTagName('tbody')[0];
         const newRow = table.insertRow(-1);
+        const lineTotal = line.quantity * line.price;
+        
         newRow.innerHTML = `
             <td><input type="text" class="description" value="${line.description}" required></td>
-            <td><input type="number" class="quantity" value="${line.quantity}" required oninput="calculateTotal()"></td>
-            <td><input type="number" class="price" value="${line.price}" required oninput="calculateTotal()"></td>
+            <td><input type="number" class="quantity" value="${line.quantity}" required></td>
+            <td><input type="number" class="price" value="${line.price}" required></td>
+            <td class="line-total">${lineTotal.toFixed(2)}</td>
             <td><button type="button" onclick="removeLine(this)">Eliminar</button></td>
         `;
+
+        setupLineListeners(newRow);
     });
+
+    // Calcular el total després d'afegir totes les línies
+    calculateTotal();
 
     // Guardar l'índex actual com a fila d'edició
     currentEditingIndex = index;
-}
 
+    // Si hi ha un descompte, l'apliquem
+    if (invoice.discount) {
+        document.getElementById('discount').value = invoice.discount;
+    }
+}
 // Funció per netejar els inputs de la factura
 function clearInvoiceInputFields() {
-    const table = document.getElementById('invoice-lines');
-    const rows = table.querySelectorAll('tr:not(:first-child)');
-    rows.forEach(row => {
-        row.querySelector('.description').value = ''; // Netejar el camp de descripció
-        row.querySelector('.quantity').value = ''; // Netejar el camp de quantitat
-        row.querySelector('.price').value = ''; // Netejar el camp de preu
-    });
+    const table = document.getElementById('invoice-lines').getElementsByTagName('tbody')[0];
+    table.innerHTML = ''; // Eliminar totes les files existents
+    document.getElementById('discount').value = ''; // Netejar el camp del descompte
+    // No netegem el camp del client aquí, ja que volem mantenir-lo en edició
 }
 
 // Funció per eliminar una factura
@@ -176,7 +225,12 @@ function deleteInvoice(index) {
     renderInvoices(); // Actualitzar la llista de factures
 }
 
-// Afegir la primera línia quan es carrega la pàgina
+// Afegir la primera línia i configurar els listeners quan es carrega la pàgina
 document.addEventListener('DOMContentLoaded', (event) => {
-    addLine(); // Cridar la funció addLine per afegir la primera línia
+    addLine();
+    const firstRow = document.querySelector('#invoice-lines tbody tr');
+    if (firstRow) {
+        setupLineListeners(firstRow);
+    }
+    initializeDiscountListener();
 });
